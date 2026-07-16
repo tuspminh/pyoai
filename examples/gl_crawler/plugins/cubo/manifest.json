@@ -1,0 +1,8 @@
+{
+    "id": "vn.truyenfull",
+    "name": "TruyenFull",
+    "version": "1.0.0",
+    "author": "Developer",
+    "description": "Plugin cào dữ liệu từ website TruyenFull",
+    "base_url": "https://truyenfull.io"
+}

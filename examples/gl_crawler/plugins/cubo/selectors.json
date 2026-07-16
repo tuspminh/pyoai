@@ -1,0 +1,20 @@
+{
+    "search": {
+        "item": "div.list-truyen div.row",
+        "title": "h3.truyen-title a",
+        "url": "h3.truyen-title a",
+        "author": "span.author",
+        "poster": "div.lazyimg"
+    },
+    "detail": {
+        "title": "h3.title",
+        "author": "a[itemprop='author']",
+        "status": "span.text-success, span.text-primary",
+        "description": "div.desc-text",
+        "chapter_item": "ul.list-chapter li a"
+    },
+    "chapter": {
+        "title": "a.chapter-title",
+        "content": "div.chapter-c"
+    }
+}
