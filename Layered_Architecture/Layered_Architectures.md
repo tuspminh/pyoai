@@ -3,7 +3,6 @@ Dĩ nhiên. Hãy xem 4 kiến trúc này như một quá trình tiến hóa từ
 
 ### 1\. MVC – Model View Controller
 
-<img src="images/img_LA_4.jpg" alt="MVC vs MVVM- A complete guide with comparison" width="1200" height="753">
 
 ![](./images/img_LA_4.jpg)
 
@@ -41,7 +40,6 @@ Viewrenders
 
 ### 2\. MVVM – Model View ViewModel
 
-<img src="images/img_LA_3.jpg" alt="Top iOS Architecture Interview Questions (MVC, MVVM, VIPER, Clean Architecture) | Medium" width="1400" height="933">
 
 ![](./images/img_LA_3.jpg)
 
@@ -94,7 +92,6 @@ Khi ứng dụng có:
 
 ### 3\. Clean Architecture
 
-<img src="images/img_LA_0.jpg" alt="Tracing the Request Path in Clean Architecture (DTOs, Entities, Ports &amp; Adapters) | by Ihor Pal | Feb, 2026 | Medium" width="816" height="768">
 
 ![](./images/img_LA_0.jpg)
 
@@ -106,7 +103,6 @@ Thay PySide6 bằng Web, thay SQLite bằng PostgreSQL mà nghiệp vụ gần n
 
 ### Các lớp
 
-<img src="images/img_LA_1.jpg" alt="Integrating Apache Spark with Redis for Low-Latency Data Access by Neeraj | Towards Data Engineering" width="1166" height="736">
 
 ![](./images/img_LA_1.jpg)
 
@@ -132,7 +128,6 @@ Thay PySide6 bằng Web, thay SQLite bằng PostgreSQL mà nghiệp vụ gần n
 
 ### 4\. Domain-Driven Design (DDD)
 
-<img src="images/img_LA_2.jpg" alt="System Architecture Design Methodology: Mastering Enterprise Architecture, Domain-Driven Design, and SAAS Systems | by JIN | Medium" width="1400" height="933">
 
 ![](./images/img_LA_2.jpg)
 
