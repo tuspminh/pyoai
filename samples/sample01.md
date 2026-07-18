@@ -1,87 +1,65 @@
-Version:0.9 StartHTML:00000097 EndHTML:00099722 StartFragment:00000131 EndFragment:00099686 
+Version:0.9 StartHTML:00000097 EndHTML:00059861 StartFragment:00000131 EndFragment:00059825 
 
-Để chuyển đổi dữ liệu HTML lấy từ Clipboard thành định dạng Markdown, cách tốt nhất và an toàn nhất là kết hợp **BeautifulSoup** (để loại bỏ phần header của Windows và định vị nội dung chính) và thư viện **html2text** (một thư viện chuyên dụng, tự động chuyển đổi HTML sang Markdown rất chuẩn xác).
+Để đóng gói đoạn code Python chạy ngầm trên thành một file `.exe` độc lập chạy được trên mọi máy Windows, chúng ta sẽ sử dụng công cụ **PyInstaller**.
 
-1\. Cài đặt các thư viện cần thiết
+Đặc biệt, thư viện `keyboard` hoạt động ở mức hệ thống nên khi đóng gói, bạn cần chạy file `.exe` với quyền Admin (Administrator) thì nó mới bắt được phím tắt một cách ổn định nhất.
 
-Bạn mở Terminal/Command Prompt trên Windows và cài đặt 2 thư viện này:
+Dưới đây là các bước thực hiện chi tiết:
+
+Bước 1: Cài đặt PyInstaller
+
+Bạn mở Command Prompt (CMD) và cài đặt thư viện đóng gói bằng lệnh:
 
 bash
     
     
-    pip install beautifulsoup4 html2text
+    pip install pyinstaller
     
 
 Hãy thận trọng khi sử dụng mã.
 
-2\. Đoạn mã Python hoàn chỉnh
+Bước 2: Chuẩn bị file code
 
-Đoạn code dưới đây sẽ lấy HTML từ clipboard, lọc bỏ phần Header rác của Windows, sau đó chuyển đổi toàn bộ tiêu đề (h1-h6), mã nguồn (`inline code`, `code block`), liên kết, chữ đậm/nghiêng... thành cấu trúc Markdown tương ứng.
+Đảm bảo bạn đã lưu đoạn code Python chạy ngầm ở bước trước vào một file, ví dụ đặt tên là `html_to_md_bot.py`.
 
-python
+Bước 3: Chạy lệnh đóng gói
+
+Trong cửa sổ CMD, bạn di chuyển đến thư mục chứa file code đó (dùng lệnh `cd`) và chạy lệnh sau:
+
+bash
     
     
-    import win32clipboard
-    from bs4 import BeautifulSoup
-    import html2text
-    
-    def get_clipboard_html():
-        """Lấy dữ liệu HTML thô từ Windows Clipboard"""
-        win32clipboard.OpenClipboard()
-        try:
-            html_format = win32clipboard.RegisterClipboardFormat("HTML Format")
-            if win32clipboard.IsClipboardFormatAvailable(html_format):
-                data_raw = win32clipboard.GetClipboardData(html_format)
-                # Trình duyệt thường dùng utf-8, nếu lỗi có thể thử 'iso-8859-1' hoặc 'cp1252'
-                return data_raw.decode('utf-8', errors='ignore')
-            return None
-        except Exception as e:
-            print(f"Lỗi truy cập clipboard: {e}")
-            return None
-        finally:
-            win32clipboard.CloseClipboard()
-    
-    def html_to_markdown(html_raw):
-        """Lọc header Windows và chuyển đổi nội dung sang Markdown"""
-        if not html_raw:
-            return "Không có dữ liệu HTML trong clipboard."
-    
-        # 1. Dùng BeautifulSoup để tự động bỏ qua phần Header mô tả của Windows 
-        # và chỉ tập trung vào phần cây thư mục HTML thực tế bên dưới.
-        soup = BeautifulSoup(html_raw, 'html.parser')
-        
-        # 2. Cấu hình trình chuyển đổi html2text
-        converter = html2text.HTML2Text()
-        converter.bypass_tables = False  # Giữ nguyên cấu trúc bảng nếu có
-        converter.ignore_links = False   # Giữ lại các liên kết [Text](URL)
-        converter.ignore_emphasis = False # Giữ lại chữ in đậm (**), in nghiêng (*)
-        converter.body_width = 0         # Không tự động xuống dòng khi câu quá dài
-    
-        # 3. Tiến hành chuyển đổi
-        markdown_result = converter.handle(str(soup))
-        return markdown_result.strip()
-    
-    if __name__ == "__main__":
-        print("Đang đọc dữ liệu từ clipboard...")
-        raw_html = get_clipboard_html()
-        
-        if raw_html:
-            markdown_text = html_to_markdown(raw_html)
-            print("\n--- KẾT QUẢ MARKDOWN --- \n")
-            print(markdown_text)
-        else:
-            print("Vui lòng bôi đen và copy một đoạn văn bản từ trình duyệt trước!")
+    pyinstaller --onefile --noconsole --uac-admin html_to_md_bot.py
     
 
 Hãy thận trọng khi sử dụng mã.
 
-Cách đoạn code này xử lý các thành phần bạn yêu cầu:
+**Giải thích ý nghĩa các tham số:**
 
-  * **Headers/Titles (`<h1>` đến `<h6>`):** Tự động chuyển thành `#`, `##`, `###`... tương ứng.
-  * **Code Inline (`<code>`):** Tự động bọc lại bằng dấu huyền đơn `giống thế này`.
-  * **Code Block (`<pre><code>`):** Tự động nhận diện block code từ các trang web (như GitHub, StackOverflow) và bọc lại bằng 3 dấu huyền ``` kèm theo xuống dòng chuẩn xác.
+  * `--onefile`: Đóng gói tất cả thư viện và code thành **đúng 1 file`.exe` duy nhất** cho gọn.
+  * `--noconsole`: Ẩn hoàn toàn cửa sổ dòng lệnh (CMD đen) khi file `.exe` khởi chạy. Chương trình sẽ hoàn toàn chạy ẩn dưới nền (Background process).
+  * `--uac-admin`: Tự động yêu cầu quyền **Administrator** khi người dùng nhấp đúp vào file `.exe`. Điều này bắt buộc phải có để thư viện `keyboard` lắng nghe được phím tắt `Ctrl + Alt + M` trên toàn hệ thống Windows mà không bị chặn.
 
 
 
-Bạn có muốn bổ sung thêm tính năng **tự động lưu kết quả Markdown này thành một file`.md`** ngay sau khi chạy code, hoặc **tự động nạp ngược đoạn Markdown này vào lại clipboard** để bạn chỉ việc nhấn `Ctrl + V` sang ứng dụng khác không? Hãy cho mình biết nhé!
+Bước 4: Lấy kết quả
+
+  * Sau khi PyInstaller chạy xong (hiển thị thông báo `Building EXE from EXE-00.toc completed successfully`), bạn sẽ thấy một thư mục mới tên là **`dist`** xuất hiện trong thư mục code.
+  * Vào thư mục `dist`, bạn sẽ thấy file **`html_to_md_bot.exe`**.
+
+
+
+Bây giờ bạn chỉ cần copy đúng file `.exe` này đem sang bất kỳ máy tính Windows nào khác là có thể sử dụng ngay mà không cần cài đặt Python, BeautifulSoup hay html2text nữa!
+
+Cách tắt ứng dụng khi đang chạy ẩn
+
+Vì chúng ta đã ẩn hoàn toàn giao diện (`--noconsole`), để tắt công cụ này khi không muốn dùng nữa, bạn làm như sau:
+
+  1. Nhấn `Ctrl + Shift + Esc` để mở **Task Manager**.
+  2. Tìm tiến trình có tên `html_to_md_bot.exe` (hoặc tên file bạn đã đặt).
+  3. Chuột phải vào nó và chọn **End Task**.
+
+
+
+Bạn có muốn mình hướng dẫn cách thêm một **icon tùy chỉnh (file .ico)** cho file `.exe` này nhìn chuyên nghiệp hơn, hoặc cần hỗ trợ gì trong quá trình đóng gói không?
 
