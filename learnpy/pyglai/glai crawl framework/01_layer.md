@@ -49,7 +49,7 @@ Hãy thận trọng khi sử dụng mã.
 
 Tầng này chỉ làm việc với cơ sở dữ liệu qua SQL thuần, không chứa logic cào web.
 
-**File:** `database/db_manager.py`
+**File:** ``
 
 python
     
