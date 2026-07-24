@@ -1,182 +1,114 @@
-Tôi sẽ đóng vai **lập trình viên Python chuyên nghiệp + kiến trúc sư hệ thống backend** , hướng dẫn bạn học **Celery từ cơ bản đến chuyên sâu (Deep Dive)** theo hướng thực tế: xây dựng hệ thống xử lý nền (background task), queue, worker, scheduler, distributed task system.
+Tôi sẽ hướng dẫn bạn học **Celery từ cơ bản đến chuyên nghiệp** theo góc nhìn của một **Python backend developer**. Celery là một chủ đề rất quan trọng khi xây dựng hệ thống thực tế: xử lý tác vụ nền (background jobs), hàng đợi (message queue), hệ thống phân tán, microservices, scraping, gửi email, xử lý file, AI pipeline...
 
-Celery là một kỹ năng rất quan trọng khi bạn làm:
-
-  * Web backend (Django/FastAPI/Flask) 
-  * Hệ thống xử lý file lớn 
-  * Scraper/crawler 
-  * Gửi email/SMS hàng loạt 
-  * Xử lý AI/ML job 
-  * Pipeline dữ liệu 
-  * Microservices 
-
-
-
-* * *
+Vì bạn đã học khá nhiều Python nâng cao (asyncio, Redis, SQLite, Plugin Architecture, Framework Design...), tôi sẽ đi theo hướng **Celery Deep Dive** , không chỉ học cách chạy task mà hiểu kiến trúc bên trong.
 
 # Roadmap học Celery Deep Dive
 
 ## Giai đoạn 1: Nền tảng Celery
 
-### Buổi 1: Tổng quan Celery và kiến trúc hệ thống
+### Buổi 1: Tổng quan Celery và bài toán thực tế
 
   * Celery là gì? 
   * Vì sao cần Celery? 
-  * Synchronous vs Asynchronous 
-  * Background task 
-  * Message Queue 
-  * Broker 
-  * Worker 
-  * Result Backend 
-  * Producer / Consumer model 
-  * Celery workflow 
+  * Background task là gì? 
+  * Synchronous vs Asynchronous processing 
+  * Kiến trúc Celery 
+  * Message Queue là gì? 
+  * Broker, Worker, Result Backend 
+  * Celery hoạt động như thế nào? 
 
 
-
-Mini project:
-    
-    
-    Python App
-        |
-        |
-      Celery Task
-        |
-        |
-     Message Broker
-    (Redis/RabbitMQ)
-        |
-        |
-     Worker Process
-        |
-        |
-     Result Backend
-
-* * *
 
 ### Buổi 2: Cài đặt môi trường Celery
 
-Học:
-
-  * Cài celery 
-  * Redis làm broker 
-  * RabbitMQ làm broker 
-  * Docker environment 
-  * Cấu trúc project 
-
+  * Cài Celery 
+  * Redis làm Broker 
+  * RabbitMQ làm Broker 
+  * Cấu trúc project chuẩn 
+  * Chạy worker 
+  * Debug Celery 
 
 
-Ví dụ:
-    
-    
-    celery-demo/
-    │
-    ├── app/
-    │   ├── celery_app.py
-    │   ├── tasks.py
-    │
-    ├── worker.py
-    └── requirements.txt
-
-* * *
 
 ### Buổi 3: Task cơ bản
 
-Học:
-
-  * @task decorator 
+  * @app.task 
   * delay() 
   * apply_async() 
-  * task arguments 
-  * return value 
-  * task id 
+  * Task signature 
+  * Task arguments 
+  * Return result 
 
 
 
-Ví dụ:
-    
-    
-    from celery import Celery
-    
-    
-    app = Celery(
-        "demo",
-        broker="redis://localhost:6379/0"
-    )
-    
-    
-    @app.task
-    def add(x, y):
-        return x + y
+### Buổi 4: Worker Deep Dive
 
-Chạy:
-    
-    
-    result = add.delay(10,20)
-    
-    print(result.id)
-
-* * *
-
-# Giai đoạn 2: Celery thực chiến
-
-## Buổi 4: Worker
-
-Học:
-
-  * celery worker 
-  * concurrency 
-  * prefork 
-  * threads 
-  * eventlet 
-  * gevent 
+  * Worker process 
+  * Concurrency model 
+  * Prefork 
+  * Threads 
+  * Eventlet 
+  * Gevent 
+  * Worker lifecycle 
 
 
 
-Chạy:
-    
-    
-    celery -A app worker --loglevel=INFO
-
-* * *
-
-## Buổi 5: Result Backend
-
-Học:
+### Buổi 5: Result Backend
 
   * AsyncResult 
-  * trạng thái task 
+  * Task ID 
+  * State 
+  * SUCCESS 
+  * FAILURE 
+  * RETRY 
+  * PENDING 
+  * Storing results 
 
 
 
-Các state:
-    
-    
-    PENDING
-    STARTED
-    SUCCESS
-    FAILURE
-    RETRY
-    REVOKED
+* * *
+
+# Giai đoạn 2: Task nâng cao
+
+## Buổi 6: Task Design Pattern
+
+Học cách thiết kế task chuẩn:
 
 Ví dụ:
     
     
-    from celery.result import AsyncResult
-    
-    result = AsyncResult(task_id)
-    
-    print(result.status)
+    user_upload_file
+            |
+            |
+            v
+    Celery Task
+            |
+            |
+            +-- validate
+            |
+            +-- process
+            |
+            +-- save database
+
+Nội dung:
+
+  * Task nhỏ vs task lớn 
+  * Idempotent task 
+  * Atomic task 
+  * Retry-safe task 
+  * Transaction trong task 
+
+
 
 * * *
 
-## Buổi 6: Task nâng cao
+## Buổi 7: Retry và Error Handling
 
-Học:
-
-  * bind task 
-  * retry 
-  * timeout 
-  * rate limit 
+  * self.retry() 
+  * max_retries 
+  * retry countdown 
+  * exponential backoff 
+  * autoretry_for 
 
 
 
@@ -184,51 +116,20 @@ Ví dụ:
     
     
     @app.task(
-        bind=True,
-        max_retries=3
+        autoretry_for=(Exception,),
+        retry_backoff=True,
+        max_retries=5
     )
-    def download(self,url):
-    
-        try:
-            return requests.get(url)
-    
-        except Exception as e:
-            raise self.retry(
-                exc=e,
-                countdown=10
-            )
+    def download(url):
+        ...
 
 * * *
 
-## Buổi 7: Scheduling với Celery Beat
+## Buổi 8: Celery Canvas
 
-Học:
+Đây là phần rất quan trọng.
 
-  * Cron job 
-  * Periodic task 
-  * celery beat 
-
-
-
-Ví dụ:
-
-Mỗi ngày 0h:
-    
-    
-    beat_schedule = {
-    
-    "backup-db":{
-        "task":"backup",
-        "schedule":86400
-    }
-    
-    }
-
-* * *
-
-# Giai đoạn 3: Celery Workflow
-
-## Buổi 8: Canvas API
+Celery Canvas là hệ thống workflow.
 
 Học:
 
@@ -236,266 +137,295 @@ Học:
   * Chain 
   * Group 
   * Chord 
+  * Map 
+  * Starmap 
 
 
 
 Ví dụ:
-
-Pipeline:
     
     
-    Download
-       |
-    Process
-       |
-    Save DB
-
-Code:
+    Download 100 images
     
+            |
+            |
+          group
     
-    chain(
-     download.s(),
-     process.s(),
-     save.s()
-    )()
-
-* * *
-
-## Buổi 9: Group Task
-
-Chạy song song:
+      img1 img2 img3
     
-    
-    Task A
-    Task B
-    Task C
-          |
-          |
-       Collect
-
-Ví dụ:
-    
-    
-    group(
-     add.s(1,2),
-     add.s(3,4)
-    )()
-
-* * *
-
-## Buổi 10: Chord
-
-Pattern:
-    
-    
-    Many tasks
-    
-       |
-       |
-    
-    Callback
-
-Ví dụ:
-
-Xử lý 1000 ảnh:
-    
-    
-    resize image 1
-    resize image 2
-    ...
-    resize image 1000
+            |
+            |
+          chord
     
             |
             |
     
-    create zip
+    Create ZIP
 
 * * *
 
-# Giai đoạn 4: Production Celery
+# Giai đoạn 3: Celery với Database
+
+## Buổi 9: Celery + SQLAlchemy
+
+  * Session management 
+  * Database transaction 
+  * Worker database connection 
+  * Connection pool 
+
+
+
+## Buổi 10: Celery + Django/Flask/FastAPI
+
+  * FastAPI Background Task khác Celery thế nào? 
+  * API gọi Celery 
+  * Monitor task 
+  * Authentication 
+
+
+
+* * *
+
+# Giai đoạn 4: Production
 
 ## Buổi 11: Redis Deep Dive cho Celery
 
-Học:
-
-  * Redis queue 
-  * visibility timeout 
-  * persistence 
-  * memory management 
-
+  * Redis Queue 
+  * Redis persistence 
+  * Visibility timeout 
+  * Lost task 
+  * Reliability 
 
 
-* * *
 
 ## Buổi 12: RabbitMQ Deep Dive
 
-Học:
-
   * Exchange 
   * Queue 
-  * Routing key 
+  * Routing Key 
   * Binding 
-  * AMQP 
+  * ACK/NACK 
 
 
 
 * * *
 
-## Buổi 13: Monitoring
+## Buổi 13: Celery Configuration
+
+Production config:
+    
+    
+    CELERY = {
+        "broker_url":
+            "redis://localhost:6379/0",
+    
+        "result_backend":
+            "redis://localhost:6379/1",
+    
+        "task_serializer":
+            "json",
+    
+        "accept_content":
+            ["json"]
+    }
 
 Học:
+
+  * timezone 
+  * serializer 
+  * compression 
+  * prefetch 
+  * acknowledgement 
+
+
+
+* * *
+
+# Giai đoạn 5: Advanced Celery
+
+## Buổi 14: Periodic Task với Celery Beat
+
+Cron trong Python:
+
+Ví dụ:
+    
+    
+    Every midnight:
+    
+    backup_database.delay()
+
+Học:
+
+  * celery beat 
+  * schedule 
+  * crontab 
+  * periodic task 
+
+
+
+* * *
+
+## Buổi 15: Celery Monitoring
 
   * Flower 
   * Task monitoring 
   * Worker monitoring 
+  * Event system 
 
 
 
 * * *
 
-## Buổi 14: Error Handling
+## Buổi 16: Scaling Celery
 
-Học:
+  * Multiple workers 
+  * Multiple queues 
+  * Priority queue 
+  * Routing task 
 
-  * Retry strategy 
-  * Dead letter queue 
-  * Failed task 
-  * Logging 
+
+
+Ví dụ:
+    
+    
+              API
+    
+               |
+               |
+    
+         Celery Broker
+    
+    
+         /          \
+    
+    worker-fast   worker-heavy
+    
+    
+    email task    AI task
+
+* * *
+
+## Buổi 17: Celery Security
+
+  * Message signing 
+  * Serializer security 
+  * Redis security 
+  * RabbitMQ authentication 
 
 
 
 * * *
 
-## Buổi 15: Performance tuning
+## Buổi 18: Celery với Docker
 
-Học:
-
-  * Prefetch 
-  * Worker pool 
-  * Concurrency 
-  * Memory leak 
-  * Task optimization 
-
-
+Production stack:
+    
+    
+    docker-compose
+    
+        |
+        |
+        +-- FastAPI
+        |
+        +-- Celery Worker
+        |
+        +-- Celery Beat
+        |
+        +-- Redis
+        |
+        +-- PostgreSQL
 
 * * *
 
-# Giai đoạn 5: Kiến trúc nâng cao
+## Buổi 19: Celery trong hệ thống thực tế
 
-## Buổi 16: Celery + FastAPI
+Thiết kế:
 
-Xây dựng:
+### Web crawler
     
     
     FastAPI
+    
      |
      |
     Celery
+    
      |
      |
-    Redis
+    Crawler workers
+    
      |
      |
-    Worker
+    Database
+
+Ứng dụng rất gần với dự án scraper truyện mà bạn đang học.
 
 * * *
 
-## Buổi 17: Celery + Django
+## Buổi 20: Celery Architecture Expert
 
-Học:
-
-  * django-celery 
-  * transaction handling 
-  * ORM task 
-
-
-
-* * *
-
-## Buổi 18: Celery + Database
-
-Học:
-
-  * SQLAlchemy 
-  * SQLite 
-  * PostgreSQL 
-  * Task persistence 
+  * Distributed system 
+  * Message delivery guarantee 
+  * At least once delivery 
+  * Exactly once problem 
+  * Event driven architecture 
+  * Task orchestration 
 
 
 
 * * *
 
-## Buổi 19: Celery Plugin Architecture
+# Dự án cuối khóa
 
-Thiết kế:
-    
-    
-    plugins/
-    
-    crawler/
-        tasks.py
-    
-    email/
-        tasks.py
-    
-    image/
-        tasks.py
+Chúng ta sẽ xây dựng:
 
-* * *
-
-## Buổi 20: Project thực tế
-
-Xây dựng:
-
-# Distributed Web Scraper System
+## Project: Distributed Story Scraper System
 
 Kiến trúc:
     
     
-            PySide6 Dashboard
+                     PySide6 Dashboard
     
-                  |
-                  |
+                           |
+                           |
     
-              API Server
+                        FastAPI
     
-                  |
-                  |
+                           |
+                           |
     
-              Celery Queue
+                      Celery Broker
+                           |
+            --------------------------------
     
-                  |
-            ----------------
+            Worker 1       Worker 2       Worker 3
     
-           Worker  Worker Worker
+            TruyenFull     NovelSource    Parser
     
-              |
-              |
+                           |
     
-           SQLite/PostgreSQL
+                        SQLite/PostgreSQL
     
 
 Chức năng:
 
-  * Crawl nhiều website 
-  * Pause/resume 
-  * Retry 
-  * Schedule 
-  * Monitoring 
-  * Logging 
+  * Add website source 
+  * Queue crawl job 
+  * Pause/resume crawler 
+  * Retry lỗi 
+  * Schedule crawl 
+  * Monitor worker 
+  * Save result 
 
 
 
 * * *
 
-# Công cụ sử dụng xuyên suốt
+# Công cụ sử dụng
 
-Python:
-    
-    
-    python >=3.12
+Chúng ta sẽ dùng:
 
-Libraries:
+Python 3.12+
     
     
     celery
@@ -504,30 +434,26 @@ Libraries:
     sqlalchemy
     fastapi
     pydantic
-
-Docker:
-    
-    
-    redis
-    rabbitmq
-    postgres
+    docker
+    pytest
 
 * * *
 
-# Cách học
+# Kiến thức cần có trước
 
-Mỗi buổi tôi sẽ trình bày:
+Bạn đã có khá nhiều:
 
-  1. Lý thuyết kiến trúc 
-  2. Giải thích cơ chế bên trong 
-  3. Code ví dụ 
-  4. Debug lỗi thường gặp 
-  5. Bài tập thực hành 
-  6. Áp dụng production 
+✅ Python OOP  
+✅ Decorator  
+✅ Asyncio  
+✅ Redis cơ bản  
+✅ Database  
+✅ Repository Pattern  
+✅ Plugin Architecture
 
-
+Rất phù hợp để học Celery.
 
 * * *
 
-Chúng ta bắt đầu:
+Bắt đầu từ **Buổi 1: Celery là gì? Kiến trúc Broker - Worker - Result Backend và cách Celery giải quyết bài toán thực tế**.
 
